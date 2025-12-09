@@ -232,7 +232,7 @@ const PhilosophyQuiz = () => {
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Философия Тест
+              MOOK ТЕСТ ЕБАНАЖИЗНЬ
             </h1>
             <p className="text-center text-gray-600 mb-8">Выберите режим</p>
             <div className="mb-6 p-4 bg-indigo-50 rounded-lg">
