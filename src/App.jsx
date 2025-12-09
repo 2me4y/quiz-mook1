@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Shuffle, List, RotateCcw, CheckCircle, XCircle, CheckSquare, Square, Image as ImageIcon } from 'lucide-react';
-
-// Импорт ваших данных
 import rawQuestions from './quiz_data.json'; 
 
 const PhilosophyQuiz = () => {
@@ -9,24 +7,18 @@ const PhilosophyQuiz = () => {
 
   const [mode, setMode] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // --- НОВЫЕ СОСТОЯНИЯ ---
-  const [selectedIndices, setSelectedIndices] = useState([]); // Для хранения ответов (массив)
-  const [textInput, setTextInput] = useState('');           // Для ввода текста
-  // -----------------------
-
+  const [selectedIndices, setSelectedIndices] = useState([]);
+  const [textInput, setTextInput] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [incorrectQuestions, setIncorrectQuestions] = useState([]);
   const [questionOrder, setQuestionOrder] = useState([]);
   const [stats, setStats] = useState({ correct: 0, incorrect: 0 });
-  
   const [showRangeInput, setShowRangeInput] = useState(false);
   const [startQuestion, setStartQuestion] = useState(1);
   const [endQuestion, setEndQuestion] = useState(questions.length);
   const [shuffleOptions, setShuffleOptions] = useState(false);
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
 
-  // Перемешивание массива
   const shuffleArray = (array) => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -36,14 +28,12 @@ const PhilosophyQuiz = () => {
     return shuffled;
   };
 
-  // Умное перемешивание (учитывает множественные ответы)
   const createShuffledQuestion = (question) => {
     if (question.type === 'input') return question;
 
     const optionsWithIndex = question.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
     const shuffled = shuffleArray(optionsWithIndex);
 
-    // Пересчитываем правильные индексы
     let newCorrect;
     if (question.type === 'multiple_select' && Array.isArray(question.correct)) {
         newCorrect = question.correct.map(origIdx => 
@@ -60,7 +50,6 @@ const PhilosophyQuiz = () => {
     };
   };
 
-  // Сброс состояния ответов
   const resetAnswerState = () => {
     setSelectedIndices([]);
     setTextInput('');
@@ -118,20 +107,16 @@ const PhilosophyQuiz = () => {
     }
   };
 
-  // --- ЛОГИКА ПРОВЕРКИ ---
-
   const handleOptionClick = (index, type) => {
     if (showResult) return;
 
     if (type === 'multiple_select') {
-        // Множественный выбор: ставим/убираем галочку
         if (selectedIndices.includes(index)) {
             setSelectedIndices(selectedIndices.filter(i => i !== index));
         } else {
             setSelectedIndices([...selectedIndices, index]);
         }
     } else {
-        // Одиночный выбор: сразу проверяем
         setSelectedIndices([index]);
         checkAnswer([index], type);
     }
@@ -165,7 +150,6 @@ const PhilosophyQuiz = () => {
 
     if (isCorrect) {
       setStats(prev => ({ ...prev, correct: prev.correct + 1 }));
-      // Авто-переход через 800мс (как в старом дизайне)
       setTimeout(() => {
         nextQuestion();
       }, 1000);
@@ -208,7 +192,6 @@ const PhilosophyQuiz = () => {
     return shuffledQuestions[questionOrder[currentIndex]];
   };
 
-  // --- ЭКРАН ВЫБОРА ДИАПАЗОНА ---
   if (showRangeInput) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8">
@@ -218,39 +201,20 @@ const PhilosophyQuiz = () => {
               Выберите диапазон вопросов
             </h2>
             <p className="text-center text-gray-600 mb-8">Всего доступно: {questions.length}</p>
-            
             {shuffleOptions && (
               <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
                 <p className="text-sm text-green-700">✓ Варианты ответов будут перемешаны</p>
               </div>
             )}
-            
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">С вопроса:</label>
-                <input
-                  type="number" min="1" max={questions.length}
-                  value={startQuestion}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setStartQuestion(val === '' ? '' : parseInt(val) || 1);
-                  }}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-                />
+                <input type="number" min="1" max={questions.length} value={startQuestion} onChange={(e) => { const val = e.target.value; setStartQuestion(val === '' ? '' : parseInt(val) || 1); }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">До вопроса:</label>
-                <input
-                  type="number" min="1" max={questions.length}
-                  value={endQuestion}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setEndQuestion(val === '' ? '' : parseInt(val) || 1);
-                  }}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
-                />
+                <input type="number" min="1" max={questions.length} value={endQuestion} onChange={(e) => { const val = e.target.value; setEndQuestion(val === '' ? '' : parseInt(val) || 1); }} className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg" />
               </div>
-              
               <div className="flex gap-3 mt-6">
                 <button onClick={() => { setShowRangeInput(false); setMode(null); }} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors">Назад</button>
                 <button onClick={startSequentialQuiz} className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">Начать тест</button>
@@ -262,24 +226,21 @@ const PhilosophyQuiz = () => {
     );
   }
 
-  // --- ГЛАВНОЕ МЕНЮ ---
   if (!mode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              MOOK ЕБАНАЖИЗНЬ
+              Философия Тест
             </h1>
             <p className="text-center text-gray-600 mb-8">Выберите режим</p>
-            
             <div className="mb-6 p-4 bg-indigo-50 rounded-lg">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" checked={shuffleOptions} onChange={(e) => setShuffleOptions(e.target.checked)} className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500" />
                 <span className="text-gray-700 font-medium">🔀 Перемешать варианты ответов</span>
               </label>
             </div>
-            
             <div className="space-y-4">
               <button onClick={() => startQuiz('sequential')} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-6 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3">
                 <List size={24} />
@@ -301,7 +262,6 @@ const PhilosophyQuiz = () => {
     );
   }
 
-  // --- ЭКРАН ВОПРОСА ---
   const currentQ = getCurrentQuestion();
   const progress = ((currentIndex + 1) / questionOrder.length) * 100;
   const isMulti = currentQ.type === 'multiple_select';
@@ -310,8 +270,6 @@ const PhilosophyQuiz = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-          
-          {/* Верхняя панель */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
               <button onClick={resetQuiz} className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
@@ -324,7 +282,6 @@ const PhilosophyQuiz = () => {
             </div>
           </div>
 
-          {/* Прогресс */}
           <div className="mb-6">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>Вопрос {currentIndex + 1} из {questionOrder.length}</span>
@@ -338,65 +295,39 @@ const PhilosophyQuiz = () => {
             )}
           </div>
 
-          {/* Блок Вопроса */}
           <div className="mb-8">
-             {/* Картинка */}
+             {/* --- ИСПРАВЛЕНИЕ: ПРАВИЛЬНЫЙ ПУТЬ К КАРТИНКАМ --- */}
              {currentQ.image && (
                 <div className="mb-6 flex justify-center bg-gray-50 p-4 rounded-lg border border-gray-100">
-                  <img src={currentQ.image} alt="Task" className="max-h-80 object-contain rounded shadow-sm" />
+                  <img 
+                      src={import.meta.env.BASE_URL + currentQ.image.replace(/^\//, '')} 
+                      alt="Task" 
+                      className="max-h-80 object-contain rounded shadow-sm" 
+                  />
                 </div>
              )}
              
             <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4">{currentQ.question}</h2>
-            
             {isMulti && <span className="inline-block bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full font-bold mb-4">Выберите несколько</span>}
             {currentQ.type === 'input' && <span className="inline-block bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-bold mb-4">Впишите ответ</span>}
 
             <div className="space-y-3">
-              {/* РЕЖИМ 1: Ввод текста */}
               {currentQ.type === 'input' ? (
                 <div className="space-y-4">
-                   <input 
-                      type="text" 
-                      value={textInput} 
-                      onChange={e => setTextInput(e.target.value)}
-                      placeholder="Введите ответ..."
-                      disabled={showResult}
-                      className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg outline-none focus:border-indigo-500 transition"
-                      onKeyDown={(e) => e.key === 'Enter' && manualSubmit()}
-                   />
+                   <input type="text" value={textInput} onChange={e => setTextInput(e.target.value)} placeholder="Введите ответ..." disabled={showResult} className="w-full p-4 border-2 border-gray-300 rounded-lg text-lg outline-none focus:border-indigo-500 transition" onKeyDown={(e) => e.key === 'Enter' && manualSubmit()} />
                 </div>
               ) : (
-                // РЕЖИМ 2 и 3: Кнопки (Single / Multiple)
                 currentQ.options.map((option, index) => {
                     const isSelected = selectedIndices.includes(index);
-                    
                     let borderClass = 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50';
                     let icon = isMulti ? (isSelected ? <CheckSquare className="text-indigo-500"/> : <Square className="text-gray-400"/>) : null;
-                    
                     if (showResult) {
-                        const isCorrectIndex = isMulti 
-                            ? currentQ.correct.includes(index)
-                            : currentQ.correct === index;
-                        
-                        if (isCorrectIndex) {
-                            borderClass = 'border-green-500 bg-green-50'; 
-                            icon = <CheckCircle className="text-green-600" size={20}/>;
-                        } else if (isSelected && !isCorrectIndex) {
-                            borderClass = 'border-red-500 bg-red-50';
-                            icon = <XCircle className="text-red-600" size={20}/>;
-                        }
-                    } else if (isSelected) {
-                        borderClass = 'border-indigo-500 bg-indigo-50';
-                    }
-
+                        const isCorrectIndex = isMulti ? currentQ.correct.includes(index) : currentQ.correct === index;
+                        if (isCorrectIndex) { borderClass = 'border-green-500 bg-green-50'; icon = <CheckCircle className="text-green-600" size={20}/>; } 
+                        else if (isSelected && !isCorrectIndex) { borderClass = 'border-red-500 bg-red-50'; icon = <XCircle className="text-red-600" size={20}/>; }
+                    } else if (isSelected) { borderClass = 'border-indigo-500 bg-indigo-50'; }
                     return (
-                      <button
-                        key={index}
-                        onClick={() => handleOptionClick(index, currentQ.type)}
-                        disabled={showResult}
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex justify-between items-center ${borderClass} ${showResult ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                      >
+                      <button key={index} onClick={() => handleOptionClick(index, currentQ.type)} disabled={showResult} className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex justify-between items-center ${borderClass} ${showResult ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         <span className="text-gray-800 font-medium">{option}</span>
                         {icon}
                       </button>
@@ -405,64 +336,40 @@ const PhilosophyQuiz = () => {
               )}
             </div>
 
-            {/* Кнопка подтверждения для сложных вопросов */}
             {!showResult && (currentQ.type === 'input' || isMulti) && (
-                <button onClick={manualSubmit} className="mt-6 w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-[0.99]">
-                    Ответить
-                </button>
+                <button onClick={manualSubmit} className="mt-6 w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition transform active:scale-[0.99]">Ответить</button>
             )}
           </div>
 
-          {/* Результат (если ошибка) */}
           {showResult && (
             <div className="space-y-4">
-               {/* Логика показа правильности ответа */}
                {(() => {
                    const isCorrect = currentQ.type === 'input' 
                       ? textInput.toLowerCase() === String(currentQ.correct).toLowerCase()
                       : (isMulti 
                           ? [...selectedIndices].sort().toString() === [...currentQ.correct].sort().toString()
                           : selectedIndices[0] === currentQ.correct);
-                   
                    if (isCorrect) {
-                       return (
-                           <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800 font-bold">
-                               <CheckCircle size={20}/> Правильно! 🎉
-                           </div>
-                       )
+                       return <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800 font-bold"><CheckCircle size={20}/> Правильно! 🎉</div>
                    } else {
                        return (
                            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                                <p className="text-red-800 font-semibold flex items-center gap-2 mb-2"><XCircle size={20}/> Неправильно</p>
-                               <p className="text-red-700 text-sm">Правильный ответ: <strong>
-                                   {currentQ.type === 'input' 
-                                      ? currentQ.correct 
-                                      : (isMulti 
-                                          ? currentQ.correct.map(i => currentQ.options[i]).join(', ')
-                                          : currentQ.options[currentQ.correct])}
-                               </strong></p>
+                               <p className="text-red-700 text-sm">Правильный ответ: <strong>{currentQ.type === 'input' ? currentQ.correct : (isMulti ? currentQ.correct.map(i => currentQ.options[i]).join(', ') : currentQ.options[currentQ.correct])}</strong></p>
                            </div>
                        )
                    }
                })()}
-
-              <button
-                onClick={nextQuestion}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all"
-              >
-                {currentIndex < questionOrder.length - 1 ? 'Следующий вопрос →' : incorrectQuestions.length > 0 ? 'Повторить неправильные →' : 'Завершить тест ✓'}
-              </button>
+              <button onClick={nextQuestion} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all">{currentIndex < questionOrder.length - 1 ? 'Следующий вопрос →' : incorrectQuestions.length > 0 ? 'Повторить неправильные →' : 'Завершить тест ✓'}</button>
             </div>
           )}
-
-          {/* Финиш */}
+          
           {currentIndex === questionOrder.length - 1 && showResult && incorrectQuestions.length === 0 && (
             <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg text-center">
               <h3 className="text-2xl font-bold text-green-800 mb-2">Поздравляем! 🎊</h3>
               <p className="text-green-700">Вы прошли весь тест!</p>
             </div>
           )}
-
         </div>
       </div>
     </div>
